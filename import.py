@@ -1,9 +1,23 @@
-import pandas as pd
+import csv
+import os
 
-df = pd.read_csv('books.csv')
-df.columns = [c.lower() for c in df.columns]
+from flask import Flask, render_template, request
+from models import *
 
-from sqlalchemy import create_engine
+app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
 
-engine = create_engine("postgres://dkhxrkcvbzxsjq:4c557995c15fa7c3e4f576cf7e743d64514099c3ddba7663d729c2a392e15925@ec2-54-247-79-32.eu-west-1.compute.amazonaws.com:5432/d1ason4t4rs4tf")
-df.to_sql("books", engine, if_exists="replace")
+def main():
+    f = open("books.csv")
+    reader = csv.reader(f)
+    header = next(reader)
+    for isbn, title, author, year in reader:
+        book = Book(isbn=isbn, title=title, author=author, year=year)
+        db.session.add(book)
+    db.session.commit()
+
+if __name__ == "__main__":
+    with app.app_context():
+        main()
