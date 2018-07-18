@@ -1,5 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
-from books import db
+from books import db, login_manager
+from flask_login import UserMixin
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 class Book(db.Model):
     __tablename__ = "books"
@@ -12,7 +19,7 @@ class Book(db.Model):
     def __repr__(self):
         return f"Book({self.isbn}, {self.title}, {self.author}, {self.year})"
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
