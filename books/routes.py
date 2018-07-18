@@ -1,8 +1,12 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, session
 from books import app
 from books.forms import RegistrationForm, LoginForm
 from flask_session import Session
+from sqlalchemy.orm import scoped_session, sessionmaker
 from books.models import *
+from books import db
+
+Session(app)
 
 @app.route("/")
 def index():
