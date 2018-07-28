@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>{{ title }}</h1>
-<h2>{{ author }}</h2>
-<h2>{{ year }}</h2>
+<div class="container">
+  <h1>{{ book.title }}</h1>
+    <p>Title: {{ book.title }}</p>
+    <p>Author: {{ book.author }}</p>
+    <p>Year: {{ book.year }}</p>
+    <p>ISBN: {{ book.isbn }}</p>
+</div>
 {% endblock %}
