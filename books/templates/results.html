@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="container">
+  <h1>Results</h1>
+  {% for book in books %}
+  <ul>
+    <li>
+    <p>Title: <a href="{{ url_for('book', title=book.title) }}">{{ book.title }}</a></p>
+    <p>Author: {{ book.author }}</p>
+    </li>
+  </ul>
+  {% endfor %}
+</div>
+{% endblock %}
