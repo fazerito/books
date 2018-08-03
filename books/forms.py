@@ -39,3 +39,13 @@ class SearchForm(FlaskForm):
     select = SelectField("Search for a book: ", choices=choices)
     search = StringField("", validators=[DataRequired()])
     submit = SubmitField("Search")
+
+class RateForm(FlaskForm):
+    choices = [("1", "1"),
+                ("2", "2"),
+                ("3", "3"),
+                ("4", "4"),
+                ("5", "5")]
+    select = SelectField("Choose a rating: ", choices=choices)
+    text = StringField("Write something about it!", validators=[DataRequired()])
+    submit = SubmitField("Rate")
