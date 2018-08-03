@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, session, jsonify
 from books import app, db, bcrypt
-from books.forms import RegistrationForm, LoginForm, SearchForm
+from books.forms import RegistrationForm, LoginForm, SearchForm, RateForm
 from flask_session import Session
 from sqlalchemy.orm import scoped_session, sessionmaker
 from books.models import *
@@ -10,6 +10,7 @@ import json
 
 Session(app)
 
+reviews = []
 
 @app.route("/")
 def index():
@@ -70,17 +71,40 @@ def search():
 def results(books):
     return render_template("results.html", books=books)
 
-@app.route("/book/<string:title>")
+@app.route("/book/<string:title>", methods=["POST", "GET"])
 @login_required
 def book(title):
+    form = RateForm()
     book = Book.query.filter_by(title=title).first()
     title = book.title
-    return render_template("book.html", title=title, book=book)
+    res = requests.get("https://www.goodreads.com/book/review_counts.json",
+                        params={"key": "vM2JXxPvhe3OfoiR9dvPg", "isbns": book.isbn})
+    data = res.json()
+    review_count = data["books"][0]["work_ratings_count"]
+    average_score = data["books"][0]["average_rating"]
+    if request.method == "POST":
+        if reviews:
+            for rev in reviews:
+                if rev.user_id == current_user.id:
+                    flash("You have already submitted a review!", "danger")
+                    redirect(url_for("index"))
+                else:
+                    review = Review(text=form.text.data, rating=form.select.data, user_id=current_user.id)
+                    db.session.add(review)
+                    db.session.commit()
+                    reviews.append(review)
+        else:
+            review = Review(text=form.text.data, rating=form.select.data, user_id=current_user.id)
+            db.session.add(review)
+            db.session.commit()
+            reviews.append(review)
+    return render_template("book.html", title=title, book=book, form=form,
+                            review_count=review_count, average_score=average_score, reviews=reviews)
 
 @app.route("/api/<string:isbn>")
 def api(isbn):
     book = Book.query.filter_by(isbn=isbn).first()
-    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "vM2JXxPvhe3OfoiR9dvPg", "isbns": "1632168146"})
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "vM2JXxPvhe3OfoiR9dvPg", "isbns": book.isbn})
     data = res.json()
     return jsonify(
     title=book.title,
