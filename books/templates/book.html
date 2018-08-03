@@ -7,5 +7,40 @@
     <p>Author: {{ book.author }}</p>
     <p>Year: {{ book.year }}</p>
     <p>ISBN: {{ book.isbn }}</p>
+    <p>Review Count: {{ review_count }}</p>
+    <p>Average Score: {{ average_score }}</p>
+
+    <div class="border-top pt-3 form-group">
+        Rate this book!
+    </div>
+    <form action="" method="post">
+      <div class="form-group">
+        <div class="form-group">
+        {{ form.select(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+        {{ form.text.label(class="form-control-label") }}
+        {% if form.text.errors %}
+          {{ form.text(class="form-control form-control-lg is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.text.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+            {{ form.text(class="form-control form-control-lg") }}
+        {% endif %}
+      </div>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+      </div>
+    </form>
+    <h2>User reviews: </h2>
+    <ul>
+    {% for review in reviews %}
+      <li> {{ review.text }}, rating: {{review.rating}}</li>
+    {% endfor %}
+  </ul>
 </div>
 {% endblock %}
